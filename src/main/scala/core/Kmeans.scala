@@ -18,25 +18,40 @@ class Kmeans(clusters:Int, maxIterations:Int, dataset:Array[Array[Double]]) {
 
     val centroids:Array[Array[Double]] = initializeRandomCentroids()
 
-    createCluster(centroids)
+    val cluster = createCluster(centroids)
+
+    cluster.length
   }
-  def createCluster(centroids:Array[Array[Double]], index:Int=0, cluster:Array[Array[Double]]=Array[Array[Double]]()): Array[Array[Double]] ={  //Array[Array[Double]]
+  def createCluster(centroids:Array[Array[Double]], index:Int=0, cluster:Array[Array[Array[Double]]]=createArr()): Array[Array[Array[Double]]] ={  //Array[Array[Double]]
     if(index > _dataset.length-1) return cluster
     val closest:(Int, Double) = calculateClosestCentroid(centroids, _dataset(index))  //Index of what should be replaced
-    val newArr:Array[Array[Double]] = replaceME((closest._1, cluster), cluster(closest._1) ++ _dataset(index))   //Index,
+
+    val newArr:Array[Array[Array[Double]]] = replaceME((closest._1, cluster), cluster(closest._1) :+ _dataset(index))   //Index,
     createCluster(centroids, index+1, newArr)
   }
 
-  def replaceME(replace:(Int, Array[Array[Double]]), replaceVal:Array[Double], index:Int=0, value:Array[Array[Double]]=Array[Array[Double]]()): Array[Array[Double]] ={
-    if(index > replace._2.length-1) return value
-    if(index == replace._1) replaceME(replace, replaceVal, index+1, value :+ replaceVal)
-      else replaceME(replace, replaceVal, index+1, value :+ replace._2(index))
+  def createArr():Array[Array[Array[Double]]] ={
+    var cluster:Array[Array[Array[Double]]] = Array.ofDim(_clusters)
+    var index:Int = 0
+    for(x <- 0 until _clusters){
+      cluster(x) = Array()
+    }
+    return cluster
+  }
+
+  def replaceME(replace:(Int, Array[Array[Array[Double]]]), replaceVal:Array[Array[Double]], index:Int=0, value:Array[Array[Array[Double]]]=Array[Array[Array[Double]]]()): Array[Array[Array[Double]]] ={
+    val a:Array[Array[Array[Double]]] = replace._2
+    a(replace._1) = replaceVal
+    return a
+    //    if(index > replace._2.length-1) return value
+//    if(index == replace._1) replaceME(replace, replaceVal, index+1, value :+ replaceVal)
+//      else replaceME(replace, replaceVal, index+1, value :+ replace._2(index))
   }
   def calculateClosestCentroid(centroids:Array[Array[Double]], client:Array[Double], index:Int=0, closest:(Int, Double)=(Int.MaxValue,Double.MaxValue)): (Int, Double) ={ //Closest (Index of array, value)
     if(index > centroids.length-1) return closest
 
     val distance:Double = a.calculateEuclideanDistanceBetweenTwoArrays(client, centroids(index))
-    if(distance < closest._2){
+    if(distance.abs < closest._2.abs){
       calculateClosestCentroid(centroids, client, index+1, (index ,distance))
     } else {
       calculateClosestCentroid(centroids, client, index+1, closest)
@@ -68,6 +83,4 @@ class Kmeans(clusters:Int, maxIterations:Int, dataset:Array[Array[Double]]) {
       fillRandomSpace(dimentions, index+1, value++arr)
     }
   }
-
-
 }
