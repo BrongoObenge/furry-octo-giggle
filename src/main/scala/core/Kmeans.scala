@@ -14,14 +14,32 @@ class Kmeans(clusters:Int, maxIterations:Int, dataset:Array[Array[Double]]) {
   val a:EuclideanDistance = new EuclideanDistance()
 
 
-  def start(): Unit ={
-
-    val centroids:Array[Array[Double]] = initializeRandomCentroids()
-
-    val cluster = createCluster(centroids)
-
-    cluster.length
+  def start(centroids:Array[Array[Double]]=initializeRandomCentroids(), index:Int=0, centroidChangeDifference:Double=0): Array[Array[Array[Double]]] ={
+    val cluster:Array[Array[Array[Double]]] = createCluster(centroids)
+    if (index > _maxIterations-1) return cluster
+    start(recalcCentroid(cluster), index+1)
   }
+  def recalcCentroid(cluster:Array[Array[Array[Double]]]): Array[Array[Double]] ={
+    var newCentroid:Array[Array[Double]] = Array.ofDim(cluster.length)
+    var index:Int = 0
+    cluster.foreach((cluster) => {
+      var setAvg:Boolean = true
+      cluster.foreach((node) => {
+        if(setAvg) newCentroid(index) = node; setAvg=false
+        newCentroid(index) = calc(node, newCentroid(index))
+      })
+      index=index+1
+    })
+    return newCentroid
+  }
+  def calc(client:Array[Double], avg:Array[Double]): Array[Double]={
+    var newAvg:Array[Double] = Array.ofDim(client.length)
+    for(x <- 0 to client.size-1){
+      newAvg(x) = (client(x) + avg(x))/2
+    }
+    return newAvg
+  }
+
   def createCluster(centroids:Array[Array[Double]], index:Int=0, cluster:Array[Array[Array[Double]]]=createArr()): Array[Array[Array[Double]]] ={  //Array[Array[Double]]
     if(index > _dataset.length-1) return cluster
     val closest:(Int, Double) = calculateClosestCentroid(centroids, _dataset(index))  //Index of what should be replaced
