@@ -101,4 +101,7 @@ class Kmeans(clusters:Int, maxIterations:Int, dataset:Array[Array[Double]]) {
       fillRandomSpace(dimentions, index+1, value++arr)
     }
   }
+
+
+
 }
